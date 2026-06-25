@@ -1,109 +1,98 @@
-# 🧠 CV Recruitment Analyzer — AI-Powered
+# 📋 CV Recruitment Analyzer — Full Stack
 
-Alat analisa CV berbasis AI yang membantu HR & Rekruter menilai kesesuaian kandidat dengan posisi yang dibutuhkan secara **cepat, detail, dan objektif**.
+Aplikasi analisa CV berbasis AI dengan autentikasi user dan penyimpanan riwayat.
 
-Built with **Claude AI (Anthropic)** — tidak memerlukan backend, server, atau database. Cukup satu file HTML.
+**Stack:** Next.js 14 · Supabase (Auth + DB) · Vercel (Deploy) · Anthropic Claude API
 
 ---
 
-## ✨ Fitur Utama
+## ✨ Fitur
 
-- 📋 **Input Job Description & Kualifikasi** — tempel langsung dari sistem HR
-- 📄 **Upload CV** — support PDF & TXT, atau copy-paste teks CV
-- 🤖 **Analisa AI 10 Dimensi** meliputi:
-  - Executive Summary kandidat
-  - Tabel pencocokan setiap requirement (Match / Partial / No Match + Score)
-  - Analisa pengalaman & skill gap
-  - Achievement analysis
-  - Red flag & risiko rekrutmen
-  - Probabilitas lolos tiap tahap seleksi
-  - 10 pertanyaan interview yang tepat sasaran
-  - Estimasi range kompensasi (konteks Indonesia)
-  - Rekomendasi final dengan skor keseluruhan (A+ → E)
-- 💾 **Unduh hasil** analisa sebagai file teks
+- 🔐 **Auth** — Login & register HR via Supabase
+- 🤖 **Analisa AI** — 10 dimensi penilaian lengkap (Executive Summary, Skill Gap, Red Flags, Score, dll)
+- 💾 **Simpan otomatis** — Setiap hasil analisa tersimpan ke database
+- 📁 **Riwayat** — Lihat & hapus semua analisa sebelumnya
 - 🌙 **Dark mode** otomatis
-- 📱 **Responsive** — bisa dipakai di mobile
 
 ---
 
-## 🚀 Cara Menggunakan
+## 🚀 Setup & Deploy
 
-### 1. Clone repo ini
+### 1. Clone repo
 
 ```bash
-git clone https://github.com/username/cv-recruitment-analyzer.git
-cd cv-recruitment-analyzer
+git clone https://github.com/workimamaldiainulyaqin/Analisa-CV.git
+cd Analisa-CV
+npm install
 ```
 
-### 2. Buka `index.html` di browser
+### 2. Setup Supabase
 
-Tidak perlu install apapun. Langsung buka file-nya:
+1. Buat project baru di [supabase.com](https://supabase.com)
+2. Buka **SQL Editor**, jalankan isi file `lib/schema.sql`
+3. Copy **Project URL** dan **Anon Key** dari Settings → API
+
+### 3. Setup environment variables
+
+Buat file `.env.local`:
+
+```env
+ANTHROPIC_API_KEY=sk-ant-api03-...
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+```
+
+### 4. Jalankan lokal
 
 ```bash
-open index.html
-# atau drag-and-drop ke browser
+npm run dev
+# buka http://localhost:3000
 ```
 
-### 3. Dapatkan Anthropic API Key
+### 5. Deploy ke Vercel
 
-Daftar dan dapatkan API key di [console.anthropic.com](https://console.anthropic.com).
-
-> API key hanya tersimpan di browser kamu selama sesi berlangsung — tidak dikirim ke server manapun selain Anthropic.
-
-### 4. Isi form & analisa
-
-1. Masukkan API key, nama posisi, job description, dan kualifikasi
-2. Upload file CV kandidat (PDF/TXT) atau tempel teks CV
-3. Klik **Mulai Analisa CV**
-4. Hasil lengkap tampil dalam beberapa detik
+1. Push ke GitHub
+2. Buka [vercel.com](https://vercel.com) → **Add New Project** → import repo ini
+3. Tambahkan 3 environment variables di Vercel dashboard:
+   - `ANTHROPIC_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Klik **Deploy**
 
 ---
 
-## 📁 Struktur Repo
+## 📁 Struktur Project
 
 ```
-cv-recruitment-analyzer/
-├── index.html      # Seluruh aplikasi dalam satu file
-└── README.md       # Dokumentasi ini
+analisa-cv/
+├── app/
+│   ├── api/analyze/route.ts   # API route — proxy ke Anthropic (API key aman di server)
+│   ├── dashboard/page.tsx     # Halaman utama analisa
+│   ├── history/page.tsx       # Riwayat analisa
+│   ├── login/page.tsx         # Login & register
+│   ├── layout.tsx
+│   ├── globals.css
+│   └── page.tsx               # Redirect otomatis
+├── lib/
+│   ├── supabase.ts            # Supabase browser client
+│   ├── supabase-server.ts     # Supabase server client
+│   └── schema.sql             # SQL untuk setup database
+├── .env.local.example
+├── next.config.js
+├── package.json
+└── tsconfig.json
 ```
 
 ---
 
-## 🔧 Kustomisasi
+## 🔒 Keamanan
 
-Semua kode ada dalam `index.html`. Kamu bisa edit:
-
-- **System prompt** — ubah gaya analisa atau bahasa output (cari `systemPrompt`)
-- **Model AI** — ganti `claude-sonnet-4-6` ke model lain jika diperlukan
-- **Warna & tampilan** — edit CSS variables di bagian `:root`
-- **Format output** — ubah template prompt di bagian `textPrompt`
-
----
-
-## 💡 Tips Penggunaan
-
-- Semakin **lengkap job description & kualifikasi**, semakin akurat hasil analisa
-- Untuk CV PDF, gunakan PDF yang berisi **teks asli** (bukan scan/gambar) agar bisa dibaca AI
-- Hasil analisa bisa **diunduh** sebagai file `.txt` untuk disimpan atau dishare ke hiring manager
-
----
-
-## ⚠️ Catatan Penting
-
-- Tools ini menggunakan **Anthropic API** yang berbayar berdasarkan token penggunaan
-- Estimasi biaya per analisa: sekitar **$0.01–0.03 USD** (tergantung panjang CV & JD)
-- API key **tidak disimpan** di localStorage maupun server — hanya ada di memori browser selama tab terbuka
+- **Anthropic API key** hanya ada di server (Vercel environment variable) — tidak pernah dikirim ke browser
+- **Row Level Security** aktif di Supabase — setiap user hanya bisa lihat data miliknya sendiri
+- Auth session dikelola oleh Supabase SSR
 
 ---
 
 ## 📄 Lisensi
 
-MIT License — bebas digunakan, dimodifikasi, dan didistribusikan.
-
----
-
-## 🙌 Dibuat dengan
-
-- [Claude API — Anthropic](https://anthropic.com)
-- [Font Awesome](https://fontawesome.com) untuk ikon
-- Vanilla HTML, CSS, JavaScript — tanpa framework
+MIT License
